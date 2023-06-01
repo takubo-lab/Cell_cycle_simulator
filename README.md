@@ -7,6 +7,7 @@
 
 
 環境構築
+
 Pythonのインストール https://www.python.org/
 
 インストール時に、PythonのexeファイルへのPATH追加にチェック
