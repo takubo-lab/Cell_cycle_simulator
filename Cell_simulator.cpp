@@ -53,7 +53,7 @@ std::vector<int> simulate(int time_steps, int initial_cells, double p_die, doubl
                 new_cells.push_back(cell);
             }
             else if(rand <= 1) {
-               //  std::cout << "Div \n";
+               //  std::cout << "Stay \n";
                 // std::cout << rand << std::endl;
                 new_cells.push_back(cell);
                 
