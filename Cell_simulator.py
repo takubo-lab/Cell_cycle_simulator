@@ -37,7 +37,7 @@ def plot_bar_graph(result):
 
     # データを細胞数でソートする
     data.sort(key=lambda x: x[0], reverse=True)
-
+    print(data)
     # データを棒グラフとしてプロットする
     plt.bar(range(len(data)), [x[0] for x in data], tick_label=[x[1] for x in data])
     plt.xlabel('Simulation Result')
