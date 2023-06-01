@@ -13,7 +13,7 @@ def run_simulation():
 
     divide_prob = float(divide_prob_entry.get())
     death_prob = float(death_prob_entry.get())
-    diff_prob = 1 - divide_prob - death_prob
+    diff_prob = float(diff_prob_entry.get())
     func_decline = float(func_decline_entry.get())
     time_steps = int(time_steps_entry.get())
     initial_cells = int(initial_cells_entry.get())
@@ -21,12 +21,19 @@ def run_simulation():
 
     current_dir = os.path.dirname(os.path.realpath(__file__))
     exe_path = os.path.join(current_dir, "Cell_simulator.exe")
-    result = subprocess.run([exe_path, str(divide_prob), str(death_prob),
+
+    if divide_prob +death_prob + diff_prob <= 1:
+        label.config(text="")
+        result = subprocess.run([exe_path, str(divide_prob), str(death_prob),
                              str(diff_prob), str(func_decline), str(time_steps),
                              str(initial_cells), str(n_simulations)],
-                            capture_output=True, text=True)
+                             capture_output=True, text=True)
+        plot_bar_graph(result)
     
-    plot_bar_graph(result)
+    else:
+        label.config(text="確率の総和は1以下にしてください")
+        
+    
     
 
     # 出力を解析する
@@ -45,7 +52,9 @@ def plot_bar_graph(result):
     plt.show()
 
 def main():
+    global label
     global divide_prob_entry
+    global diff_prob_entry  
     global death_prob_entry  
     global func_decline_entry
     global time_steps_entry
@@ -53,12 +62,20 @@ def main():
     global n_simulations_entry
 
     root = tk.Tk()
+    label = tk.Label(root)
+    label.pack()
 
     divide_prob_label = ttk.Label(root, text="Divide Probability")
     divide_prob_label.pack()
     divide_prob_entry = ttk.Entry(root)
     divide_prob_entry.insert(0, '0.5')
     divide_prob_entry.pack()
+
+    diff_prob_label = ttk.Label(root, text="Differentiation Probability")
+    diff_prob_label.pack()
+    diff_prob_entry = ttk.Entry(root)
+    diff_prob_entry.insert(0, '0.2')
+    diff_prob_entry.pack()
 
     death_prob_label = ttk.Label(root, text="Death Probability")
     death_prob_label.pack()

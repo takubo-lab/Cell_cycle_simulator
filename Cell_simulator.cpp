@@ -39,18 +39,26 @@ std::vector<int> simulate(int time_steps, int initial_cells, double p_die, doubl
                //std::cout << rand << std::endl;
                 continue;
             }
-            else if(rand <= p_die + p_diff + (p_div - p_div_adjusted)) {
+            else if(rand <= p_die + p_diff) {
                 //std::cout << "Diff \n";
                 //std::cout << rand << std::endl;
                 cell.differentiated = true;
+                new_cells.push_back(cell);
+            }
+
+            else if(rand <= p_die + p_diff + p_div_adjusted) {
+                //std::cout << "Diff \n";
+                //std::cout << rand << std::endl;
+                new_cells.push_back(Cell());
                 new_cells.push_back(cell);
             }
             else if(rand <= 1) {
                //  std::cout << "Div \n";
                 // std::cout << rand << std::endl;
                 new_cells.push_back(cell);
-                new_cells.push_back(Cell());
+                
             }
+
           
         }
 
