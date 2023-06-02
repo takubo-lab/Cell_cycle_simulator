@@ -15,7 +15,7 @@ Pythonのインストール https://www.python.org/
 リポジトリのクローン作成(コマンドライン上で)
 ```
 cd C:\クローンを作成するディレクトリのパス
-git clone https://github.com/takubo-lab/Cell_cycle_simulato
+git clone https://github.com/takubo-lab/Cell_cycle_simulator.git
 ```
 
 Pythonの実行環境とライブラリー
