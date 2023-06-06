@@ -47,10 +47,17 @@ std::vector<int> simulate(int time_steps, int initial_cells, double p_die, doubl
             }
 
             else if(rand <= p_die + p_diff + p_div_adjusted) {
-                //std::cout << "Diff \n";
-                //std::cout << rand << std::endl;
+                if(cell.differentiated) {
+                // If the cell is differentiated, make both daughter cells differentiated
+                Cell newCell;
+                newCell.differentiated = true;
+                new_cells.push_back(newCell);
+                new_cells.push_back(cell);
+                } else {
+                // If the cell is not differentiated, proceed as before
                 new_cells.push_back(Cell());
                 new_cells.push_back(cell);
+                }
             }
             else if(rand <= 1) {
                //  std::cout << "Stay \n";
