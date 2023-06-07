@@ -3,6 +3,7 @@ import subprocess
 import matplotlib.pyplot as plt
 import tkinter as tk
 from tkinter import ttk
+import numpy as np
 
 
 
@@ -33,7 +34,11 @@ def run_simulation():
     else:
         label.config(text="確率の総和は1以下にしてください")
         
-    
+def save_data(data):
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    filename = os.path.join(current_dir, "data.csv")
+    np.savetxt(filename, [x[0] for x in data], delimiter="\n")
+   
     
 
     # 出力を解析する
@@ -45,6 +50,7 @@ def plot_bar_graph(result):
     # データを細胞数でソートする
     data.sort(key=lambda x: x[0], reverse=True)
     print(data)
+    save_data(data)
     # データを棒グラフとしてプロットする
     plt.bar(range(len(data)), [x[0] for x in data], tick_label=[x[1] for x in data])
     plt.xlabel('Simulation Result')
