@@ -175,21 +175,27 @@ std::vector<Chromosome> select_next_generation(const std::vector<Chromosome>& po
     return next_generation;
 }
 
+void write_fitness_to_file(const std::vector<Chromosome>& population, int generation, std::ofstream& fitness_file) {
+    for(const auto& chromosome : population) {
+        std::cout << "p_div: " << chromosome.p_div << ", func_decline: " << chromosome.func_decline << ", p_diff: " << chromosome.p_diff << ", p_die: " << chromosome.p_die << ", fitness: " << chromosome.fitness << std::endl;
+        fitness_file << generation << "," << chromosome.fitness << "\n";
+    }
+    fitness_file << std::endl;
+}
+
 std::vector<Chromosome> optimize_parameters(int time_steps, int initial_cells, int n_simulations, int population_size, int tournament_size, double crossover_rate, double mutation_rate, int elitism_count, int max_generations, std::vector<int> observed_counts) {
     std::vector<Chromosome> population = generate_initial_population(population_size);
-    std::ofstream fitness_file("fitness.csv");
+    std::ofstream fitness_file("output\\fitness.csv");
 
     for(int generation = 0; generation < max_generations; ++generation) {
         for(auto& chromosome : population) {
             chromosome.fitness = calculate_fitness(chromosome, time_steps, initial_cells, n_simulations, observed_counts);
-            std::cout << "p_div: " << chromosome.p_div << ", func_decline: " << chromosome.func_decline << ", p_diff: " << chromosome.p_diff << ", p_die: " << chromosome.p_die << ", fitness: " << chromosome.fitness << std::endl;
-            fitness_file << generation << "," << chromosome.fitness << "\n";
         }
 
         std::vector<Chromosome> parents = select_parents(population, tournament_size);
         std::vector<Chromosome> offspring = reproduce(parents, crossover_rate, mutation_rate);
         population = select_next_generation(population, offspring, elitism_count);
-        
+        write_fitness_to_file(population, generation,fitness_file);
     }
     fitness_file.close();
     return population;
@@ -241,9 +247,9 @@ void copy_fitness_file() {
 
 int main(int argc, char* argv[]) {
     std::string filename = argv[1];
-    int time_steps = 30;
-    int initial_cells = 1;
-    // int n_simulations = 10;
+    int time_steps = std::stoi(argv[2]);
+    int initial_cells = std::stoi(argv[3]);
+    //int n_simulations = std::stoi(argv[4]);
     int population_size = 100;
     int tournament_size = 5;
     double crossover_rate = 0.8;

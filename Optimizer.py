@@ -10,17 +10,27 @@ import datetime
 import threading
 
 
-def run_optimizer(filename):
+def create_output_directory():
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    output_dir = os.path.join(current_dir, "output")
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+
+def run_optimizer(filename, time_steps, initial_cells, n_simulations, simulator):
+    create_output_directory()
+
     now = datetime.datetime.now()
     current_dir = os.path.dirname(os.path.realpath(__file__))
 
     datetime_str = now.strftime("%Y-%m-%d_%H-%M-%S")
-    output_filename = f"optimized_variables_{datetime_str}.csv"
+    output_filename = f"output\\optimized_variables_{datetime_str}.csv"
     output_filename = os.path.join(current_dir,output_filename)
-    exe_path = os.path.join(current_dir, "optimizer_GA.exe")
+    
+
+    exe_path = os.path.join(current_dir,simulator)
 
     input_path = os.path.abspath(filename)
-    command = [exe_path, input_path]
+    command = [exe_path, input_path, time_steps, initial_cells, n_simulations,output_filename]
     result = subprocess.run(command, capture_output=True, text=True)
     print(result)
     #subprocess.run(command)
@@ -46,8 +56,8 @@ def run_optimizer(filename):
     return optimized_variables
 
 def animate(i):
-    #current_dir =  os.path.dirname(os.path.realpath(__file__))
-    #filename = os.path.join(current_dir,"fitness.csv")
+    current_dir =  os.path.dirname(os.path.realpath(__file__))
+    filename = os.path.join(current_dir,"output","fitness.csv")
     filename = "C:\\Users\\hikob\\fitness.csv"
     if not os.path.exists(filename):
         return
@@ -68,25 +78,61 @@ def plot_line():
     plt.show()
 
 def delete_fitness_file():
-    filename = "C:\\Users\\hikob\\fitness.csv"
+    filename = "C:\\Users\\hikob\\OneDrive\\Desktop\\output\\fitness.csv"
     if os.path.exists(filename):
         os.remove(filename)
 
+def get_filename(filename_var):
+    filename = filedialog.askopenfilename()
+    filename_var.set(filename)
 
 def main():
 
     root = tk.Tk()
-    root.withdraw() # we don't want a full GUI, so keep the root window from appearing
-    filename = filedialog.askopenfilename() # show an "Open" dialog box and return the path to the selected file
-    
-    optimizer_thread = threading.Thread(target=run_optimizer, args=(filename,))
-    optimizer_thread.start()
-    # call the C++ simulator with the filename as a command line argument
-    #plot_line()
-    optimizer_thread.join()
-    delete_fitness_file()
-    run_optimizer(filename)
-    
+
+    # create a StringVar to store the selected filename
+    filename_var = tk.StringVar()
+# create a button to get the filename
+    filename_button = tk.Button(root, text="Select File", command=lambda: get_filename(filename_var))
+    filename_button.pack()
+
+    # create text boxes for time_steps and initial_cells
+    time_steps_label = tk.Label(root, text="Time Steps:")
+    time_steps_label.pack()
+    time_steps_entry = tk.Entry(root)
+    time_steps_entry.pack()
+
+    initial_cells_label = tk.Label(root, text="Initial Cells:")
+    initial_cells_label.pack()
+    initial_cells_entry = tk.Entry(root)
+    initial_cells_entry.pack()
+
+    n_simulations_label = tk.Label(root, text="Number of Simulations:")
+    n_simulations_label.pack()
+    n_simulations_entry = tk.Entry(root)
+    n_simulations_entry.pack()
+
+    # create a dropdown menu for selecting the optimizer program
+    optimizer_label = tk.Label(root, text="Optimizer Program:")
+    optimizer_label.pack()
+    optimizer_var = tk.StringVar(root)
+    optimizer_var.set("Simulated Annealing") # default value
+    optimizer_menu = tk.OptionMenu(root, optimizer_var, "Simulated Annealing", "Genetic Algorithm", "Particle Swarm")
+    optimizer_menu.pack()
+
+    # Change the optimizer_var to the name of the actual exe file
+    if optimizer_var.get() == "Simulated Annealing":
+        simulator = "program\\optimizer_simulated_annealing.exe"
+    elif optimizer_var.get() == "Genetic Algorithm":
+        simulator = "program\\optimizer_GA.exe"
+    elif optimizer_var.get() == "Particle Swarm":
+        simulator = "program\\optimizer_particle_swarm.exe"
+
+
+    execute_button = tk.Button(root, text="Run optimization", command=lambda: run_optimizer(filename_var, lambda: time_steps_entry.get(), lambda: initial_cells_entry.get(),lambda: n_simulations_entry.get(),simulator))
+    execute_button.pack()
+
+    root.mainloop()
     
 
 

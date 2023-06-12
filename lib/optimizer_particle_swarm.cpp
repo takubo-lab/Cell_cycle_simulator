@@ -1,3 +1,4 @@
+#include "Cell.h"
 #include <iostream>
 #include <vector>
 #include <random>
