@@ -1,28 +1,22 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
-            "type": "cppbuild",
-            "label": "C/C++: g++.exe アクティブなファイルのビルド",
-            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "label": "build",
+            "type": "shell",
+            "command": "g++",
             "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
+                "-std=c++17",
+                "-I${workspaceFolder}\\OneDrive\\Desktop\\Cell_simulator_takubolab\\lib",
+                "${workspaceFolder}\\OneDrive\\Desktop\\Cell_simulator_takubolab\\src\\simulate.cpp",
+                "${workspaceFolder}\\OneDrive\\Desktop\\Cell_simulator_takubolab\\src\\cell_simulator.cpp",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
-            ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "problemMatcher": [
-                "$gcc"
+                "${workspaceFolder}\\OneDrive\\Desktop\\Cell_simulator_takubolab\\program\\cell_simulator.exe"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "detail": "デバッガーによって生成されたタスク。"
+            }
         }
-    ],
-    "version": "2.0.0"
+    ]
 }
