@@ -27,7 +27,7 @@ double objective_function(int time_steps, int initial_cells, int n_simulations, 
 
     std::sort(final_cell_counts.begin(), final_cell_counts.end(), std::greater<int>());
 
-    std::sort(final_cell_counts.begin(), final_cell_counts.end(), std::greater<int>());
+    
     //std::cout << "simulated:" <<final_cell_counts[0] << std::endl;
     //std::cout << "observed:" << observed_counts[0] << std::endl;
     double total_sum_of_squares = 0;
@@ -64,10 +64,11 @@ std::tuple<double, double, double, double> simulated_annealing(int time_steps, i
 
 
     for(int i = 0; i < MAX_ITERATIONS; ++i) {
-        double new_p_div = p_div + (dis(gen) * 2 - 1) * 0.1;
-        double new_func_decline = func_decline + (dis(gen) * 2 - 1) * 0.1;
-        double new_p_diff = p_diff + (dis(gen) * 2 - 1) * 0.1;
-        double new_p_die = p_die + (dis(gen) * 2 - 1) * 0.1;
+        double new_p_div = std::clamp(p_div + (dis(gen) * 2 - 1) * 0.1, 0.0, 0.7);
+        double new_func_decline = func_decline + (dis(gen) * 2 - 1) * 3;
+        double new_p_diff = std::clamp(p_diff + (dis(gen) * 2 - 1) * 0.1, 0.0, 0.5);
+        double new_p_die = std::clamp(p_die + (dis(gen) * 2 - 1) * 0.1, 0.0, 0.5);
+
 
         double new_energy = objective_function(time_steps, initial_cells, n_simulations, new_p_div, new_func_decline, new_p_diff, new_p_die, observed_counts);
         double ap = acceptance_probability(energy, new_energy, temperature);
@@ -79,6 +80,7 @@ std::tuple<double, double, double, double> simulated_annealing(int time_steps, i
             p_die = new_p_die;
             energy = new_energy;
         }
+        std::cout << "p_div: " << p_div << ", func_decline: " << func_decline << ", p_diff: " << p_diff << ", p_die: " << p_die << ", fitness: " << std::endl;
 
         temperature *= COOLING_RATE;
         if(temperature < FINAL_TEMPERATURE) {
@@ -148,10 +150,7 @@ int main(int argc, char* argv[]) {
     p_die = std::get<2>(result);
     func_decline = std::get<3>(result);
     
-    std::cout << "p_div: " << p_div << std::endl;
-    std::cout << "p_diff: " << p_diff << std::endl;
-    std::cout << "p_die: " << p_die << std::endl;
-    std::cout << "func_decline: " << func_decline << std::endl;
+ std::cout << "p_div: " << p_div << ", func_decline: " << func_decline << ", p_diff: " << p_diff << ", p_die: " << p_die << ", fitness: " << std::endl;
 
     return 0;
 }

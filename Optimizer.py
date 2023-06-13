@@ -10,131 +10,102 @@ import datetime
 import threading
 
 
-def create_output_directory():
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    output_dir = os.path.join(current_dir, "output")
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
+class MyApplication:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.filename = ""
+        self.input_path = ""
+        # create a StringVar to store the selected filename
+        
+        # create a button to get the filename
+        self.filename_button = tk.Button(self.root, text="Select File", command=self.get_filename)
+        self.filename_button.pack()
 
-def run_optimizer(filename, time_steps, initial_cells, n_simulations, simulator):
-    create_output_directory()
+        # create text boxes for time_steps and initial_cells
+        self.time_steps_label = tk.Label(self.root, text="Time Steps:")
+        self.time_steps_label.pack()
+        self.time_steps_entry = tk.Entry(self.root)
+        self.time_steps_entry.pack()
 
-    now = datetime.datetime.now()
-    current_dir = os.path.dirname(os.path.realpath(__file__))
+        self.initial_cells_label = tk.Label(self.root, text="Initial Cells:")
+        self.initial_cells_label.pack()
+        self.initial_cells_entry = tk.Entry(self.root)
+        self.initial_cells_entry.pack()
 
-    datetime_str = now.strftime("%Y-%m-%d_%H-%M-%S")
-    output_filename = f"output\\optimized_variables_{datetime_str}.csv"
-    output_filename = os.path.join(current_dir,output_filename)
-    
+        self.n_simulations_label = tk.Label(self.root, text="Number of Simulations:")
+        self.n_simulations_label.pack()
+        self.n_simulations_entry = tk.Entry(self.root)
+        self.n_simulations_entry.pack()
 
-    exe_path = os.path.join(current_dir,simulator)
+        # create a dropdown menu for selecting the optimizer program
+        self.optimizer_label = tk.Label(self.root, text="Optimizer Program:")
+        self.optimizer_label.pack()
+        self.optimizer_var = tk.StringVar(self.root)
+        self.optimizer_var.set("Simulated Annealing") # default value
+        self.optimizer_menu = tk.OptionMenu(self.root, self.optimizer_var, "Simulated Annealing", "Genetic Algorithm", "Particle Swarm")
+        self.optimizer_menu.pack()
 
-    input_path = os.path.abspath(filename)
-    command = [exe_path, input_path, time_steps, initial_cells, n_simulations,output_filename]
-    result = subprocess.run(command, capture_output=True, text=True)
-    print(result)
-    #subprocess.run(command)
+        # Change the optimizer_var to the name of the actual exe file
+        if self.optimizer_var.get() == "Simulated Annealing":
+            self.simulator = "program\\optimizer_simulated_annealing.exe"
+        elif self.optimizer_var.get() == "Genetic Algorithm":
+            self.simulator = "program\\optimizer_GA.exe"
+        elif self.optimizer_var.get() == "Particle Swarm":
+            self.simulator = "program\\optimizer_particle_swarm.exe"
 
+        self.execute_button = tk.Button(self.root, text="Run optimization", command=self.run_optimizer)
+        self.execute_button.pack()
 
-    output_lines = result.stdout.split("\n")
-    optimized_variables = []
-    for line in output_lines:
-        if line.startswith("p_div:"):
-            parts = line.split(", ")
-            p_div = float(parts[0].split(": ")[1])
-            func_decline = float(parts[1].split(": ")[1])
-            p_diff = float(parts[2].split(": ")[1])
-            p_die = float(parts[3].split(": ")[1])
-            fitness = float(parts[4].split(": ")[1])
-            optimized_variables.append((p_div, func_decline, p_diff, p_die, fitness))
+    # rest of your methods (e.g., get_filename, run_optimizer, ...) go here
+    def get_filename(self):
+        self.filename = filedialog.askopenfilename() # get the value from the StringVar
+        self.input_path = os.path.abspath(self.filename)
 
-    with open(output_filename, "w") as f:
-        f.write("p_div,func_decline,p_diff,p_die,fitness\n")
-        for variables in optimized_variables:
-            f.write(f"{variables[0]},{variables[1]},{variables[2]},{variables[3]},{variables[4]}\n")
+    def create_output_directory(self):
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        self.output_dir = os.path.join(current_dir, "output")
+        if not os.path.exists(self.output_dir):
+            os.mkdir(self.output_dir)
 
-    return optimized_variables
+    def run_optimizer(self):
+        self.create_output_directory()
 
-def animate(i):
-    current_dir =  os.path.dirname(os.path.realpath(__file__))
-    filename = os.path.join(current_dir,"output","fitness.csv")
-    filename = "C:\\Users\\hikob\\fitness.csv"
-    if not os.path.exists(filename):
-        return
-    
-    data = np.loadtxt(filename, delimiter=',')
-    #print(data[0])
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.clear()
-    ax.plot(data[:, 0], data[:, 1])
-    plt.xlabel('Generation')
-    plt.ylabel('Fitness')
-    plt.title('Fitness over Generations')
+        now = datetime.datetime.now()
+        current_dir = os.path.dirname(os.path.realpath(__file__))
 
-def plot_line():
-    fig = plt.figure()
-    ani = animation.FuncAnimation(fig, animate, interval=10000)
-    plt.show()
+        datetime_str = now.strftime("%Y-%m-%d_%H-%M-%S")
+        output_filename = f"output\\optimized_variables_{datetime_str}.csv"
+        output_filename = os.path.join(current_dir, output_filename)
 
-def delete_fitness_file():
-    filename = "C:\\Users\\hikob\\OneDrive\\Desktop\\output\\fitness.csv"
-    if os.path.exists(filename):
-        os.remove(filename)
+        exe_path = os.path.join(current_dir, self.simulator)
 
-def get_filename(filename_var):
-    filename = filedialog.askopenfilename()
-    filename_var.set(filename)
+        command = [exe_path, self.input_path, self.time_steps_entry.get(), self.initial_cells_entry.get(), self.n_simulations_entry.get(), output_filename]
+        result = subprocess.run(command, capture_output=False, text=False)
+        print(result)
+
+        output_lines = result.stdout.split("\n")
+        self.optimized_variables = []
+        for line in output_lines:
+            if line.startswith("p_div:"):
+                parts = line.split(", ")
+                p_div = float(parts[0].split(": ")[1])
+                func_decline = float(parts[1].split(": ")[1])
+                p_diff = float(parts[2].split(": ")[1])
+                p_die = float(parts[3].split(": ")[1])
+                self.optimized_variables.append((p_div, func_decline, p_diff, p_die))
+
+        with open(output_filename, "w") as f:
+            f.write("p_div,func_decline,p_diff,p_die\n")
+            for variables in self.optimized_variables:
+                f.write(f"{variables[0]},{variables[1]},{variables[2]},{variables[3]}\n")
+
+        return self.optimized_variables
+    def mainloop(self):
+        self.root.mainloop()
 
 def main():
-
-    root = tk.Tk()
-
-    # create a StringVar to store the selected filename
-    filename_var = tk.StringVar()
-# create a button to get the filename
-    filename_button = tk.Button(root, text="Select File", command=lambda: get_filename(filename_var))
-    filename_button.pack()
-
-    # create text boxes for time_steps and initial_cells
-    time_steps_label = tk.Label(root, text="Time Steps:")
-    time_steps_label.pack()
-    time_steps_entry = tk.Entry(root)
-    time_steps_entry.pack()
-
-    initial_cells_label = tk.Label(root, text="Initial Cells:")
-    initial_cells_label.pack()
-    initial_cells_entry = tk.Entry(root)
-    initial_cells_entry.pack()
-
-    n_simulations_label = tk.Label(root, text="Number of Simulations:")
-    n_simulations_label.pack()
-    n_simulations_entry = tk.Entry(root)
-    n_simulations_entry.pack()
-
-    # create a dropdown menu for selecting the optimizer program
-    optimizer_label = tk.Label(root, text="Optimizer Program:")
-    optimizer_label.pack()
-    optimizer_var = tk.StringVar(root)
-    optimizer_var.set("Simulated Annealing") # default value
-    optimizer_menu = tk.OptionMenu(root, optimizer_var, "Simulated Annealing", "Genetic Algorithm", "Particle Swarm")
-    optimizer_menu.pack()
-
-    # Change the optimizer_var to the name of the actual exe file
-    if optimizer_var.get() == "Simulated Annealing":
-        simulator = "program\\optimizer_simulated_annealing.exe"
-    elif optimizer_var.get() == "Genetic Algorithm":
-        simulator = "program\\optimizer_GA.exe"
-    elif optimizer_var.get() == "Particle Swarm":
-        simulator = "program\\optimizer_particle_swarm.exe"
-
-
-    execute_button = tk.Button(root, text="Run optimization", command=lambda: run_optimizer(filename_var, lambda: time_steps_entry.get(), lambda: initial_cells_entry.get(),lambda: n_simulations_entry.get(),simulator))
-    execute_button.pack()
-
-    root.mainloop()
-    
-
+    app = MyApplication()
+    app.mainloop()
 
 if __name__ == "__main__":
     main()

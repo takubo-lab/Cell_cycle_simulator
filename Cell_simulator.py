@@ -21,7 +21,7 @@ def run_simulation():
     n_simulations = int(n_simulations_entry.get())
 
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    exe_path = os.path.join(current_dir, "Cell_simulator.exe")
+    exe_path = os.path.join(current_dir, "program\\Cell_simulator.exe")
 
     if divide_prob +death_prob + diff_prob <= 1:
         label.config(text="")
