@@ -1,36 +1,82 @@
 
-# Cell_cycle_simulator
+# Cell cycle simulator
+
+Welcome to our comprehensive suite of cell biology tools, encompassing both an Optimizer and a Cell Simulator.
+
+The Optimizer, as a reinforcement learning based algorithm, aims to optimize the cell growth conditions by balancing the rate of cell division, differentiation, and death. It iteratively learns from the environment and adjusts the cell conditions to maximize cell growth and vitality.
+
+On the other hand, the Cell Simulator provides a Graphical User Interface (GUI) to simulate cell proliferation. Users can specify probabilities associated with cell division, differentiation, and death, along with the function decline parameter, number of simulation time steps, initial cell count, and number of simulations. Multiple simulations can be run with results displayed as a bar graph, enabling visualization of cell behavior under different conditions.
+
+Together, these tools offer a unique opportunity for researchers and enthusiasts to explore, understand, and manipulate cellular behaviors, providing valuable insights into cell biology.
 
 
-今回、個々の細胞に個別に運命決定を行わせる確率モデルを用いて、96 well plateでのsingle cell cultureを模倣した高速なシミュレーターを作成しました。
-それぞれの細胞は確率的に分裂、分化、死亡、そのまま、の挙動を示し、分化後には分裂確率が減衰していきます。分化後に細胞分裂の確率が減衰する以外は、それぞれのパラメーターは独立です（つまり分裂と分化は同期しない）。
+
+# Cell_simulator.py
+This is a GUI for simulating cell proliferation. In this program, the user can specify the probabilities of cell division, differentiation, and death, as well as the function decline parameter, the number of time steps for the simulation, the initial number of cells, and the number of simulations. The simulation can be run multiple times, and the results are displayed as a bar graph.
 
 
-環境構築
+## Installation
 
-Pythonのインストール https://www.python.org/
+No installation is needed. Clone the repository and run the Python file:
 
-インストール時に、PythonのexeファイルへのPATH追加にチェック
-
-リポジトリのクローン作成(コマンドライン上で)
 ```
-cd C:\クローンを作成するディレクトリのパス
 git clone https://github.com/takubo-lab/Cell_cycle_simulator.git
+cd your-repository
+python3 Cell_simulator.py
 ```
 
-Pythonの実行環境とライブラリー
-```
-pip install matplotlib 
-```
+## Dependencies
 
-実行
-```
-python Cell_simulator.py
-```
-指定可能パラメーター
+To run this application, you will need:
 
-最初の細胞数、タイムフレーム（初期値30）、タイムフレーム内での分裂確率、死亡確率、分化確率、および分化したあとの増殖の減衰率d（分裂確率×1/(1+ timeframe x d）)
-初期細胞数（初期値1）、シミュレーション回数（初期値100）
+* Python 3
+* Tkinter
+* matplotlib
+* numpy
 
 
+## Usage
 
+1. Run the script.
+2. Set parameters in the text boxes on the GUI.
+    - **Divide Probability**: Specify the probability of a cell dividing.
+    - **Differentiation Probability**: Specify the probability of a cell differentiating.
+    - **Death Probability**: Specify the probability of a cell dying.
+    - **Function Decline**: Specify the function decline parameter. This determines the degree to which the probability of cell division decreases over time.
+    - **Time Steps**: Specify the number of time steps for the simulation.
+    - **Initial Cells**: Specify the number of initial cells for the simulation.
+    - **Number of Simulations**: Specify the number of times the simulation will be run.
+3. Click the 'Run Simulation' button. The simulation will run and the results will be displayed as a bar graph.
+
+
+
+
+
+# Optimizer.py
+
+This Python-based graphical user interface (GUI) optimizes parameters for a cell division simulation. The program uses different optimization algorithms such as Simulated Annealing, Genetic Algorithm, and Particle Swarm.
+
+## Features
+
+* Load data from CSV files.
+* Input fields for time steps and initial cells.
+* Choice of optimizer program from Simulated Annealing, Genetic Algorithm, and Particle Swarm.
+* Hyperparameters settings for each optimization algorithm.
+
+
+## Usage
+
+1. Open the GUI by running the Python file.
+2. Click the "Select File" button to load your CSV data.
+3. Input the desired time steps and initial cells.
+4. Select the desired optimizer program.
+5. Input the required hyperparameters for the selected optimization algorithm.
+6. Click the "Run optimization" button to start the optimization process.
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)

@@ -28,12 +28,12 @@ std::vector<Chromosome> generate_initial_population(int population_size) {
 
     std::vector<Chromosome> population(population_size);
     for(auto& chromosome : population) {
-        chromosome.p_div = dis(gen) * 0.6;
+        chromosome.p_div = dis(gen) * 0.7;
         chromosome.func_decline = dis(gen) * 20;
         chromosome.p_diff = dis(gen) * (1 - chromosome.p_div);
         chromosome.p_die = dis(gen) * (1 - chromosome.p_div - chromosome.p_diff);
         while(chromosome.p_div + chromosome.p_diff + chromosome.p_die >= 1) {
-            chromosome.p_div = dis(gen) * 0.6;
+            chromosome.p_div = dis(gen) * 0.7;
             chromosome.p_diff = dis(gen) * (1 - chromosome.p_div);
             chromosome.p_die = dis(gen) * (1 - chromosome.p_div - chromosome.p_diff);
         }
@@ -175,17 +175,10 @@ std::vector<Chromosome> select_next_generation(const std::vector<Chromosome>& po
     return next_generation;
 }
 
-void write_fitness_to_file(const std::vector<Chromosome>& population, int generation, std::ofstream& fitness_file) {
-    for(const auto& chromosome : population) {
-        std::cout << "p_div: " << chromosome.p_div << ", func_decline: " << chromosome.func_decline << ", p_diff: " << chromosome.p_diff << ", p_die: " << chromosome.p_die << ", fitness: " << chromosome.fitness << std::endl;
-        fitness_file << generation << "," << chromosome.fitness << "\n";
-    }
-    fitness_file << std::endl;
-}
 
 std::vector<Chromosome> optimize_parameters(int time_steps, int initial_cells, int n_simulations, int population_size, int tournament_size, double crossover_rate, double mutation_rate, int elitism_count, int max_generations, std::vector<int> observed_counts) {
     std::vector<Chromosome> population = generate_initial_population(population_size);
-    std::ofstream fitness_file("output\\fitness.csv");
+    //std::ofstream fitness_file("output\\fitness_tmp.csv");
 
     for(int generation = 0; generation < max_generations; ++generation) {
         for(auto& chromosome : population) {
@@ -195,15 +188,16 @@ std::vector<Chromosome> optimize_parameters(int time_steps, int initial_cells, i
         std::vector<Chromosome> parents = select_parents(population, tournament_size);
         std::vector<Chromosome> offspring = reproduce(parents, crossover_rate, mutation_rate);
         population = select_next_generation(population, offspring, elitism_count);
-        write_fitness_to_file(population, generation,fitness_file);
+        std::cout << "generation: " << generation << ", p_div: " << population[0].p_div << ", func_decline: " << population[0].func_decline << ", p_diff: " << population[0].p_diff << ", p_die: " << population[0].p_die << ", fitness: " << population[0].fitness << std::endl;
+       // write_fitness_to_file(population, generation,fitness_file);
     }
-    fitness_file.close();
+    //fitness_file.close();
     return population;
 }
 
 std::vector<int> read_observed_counts_from_csv(const std::string& filename) {
     std::vector<int> observed_counts;
-    std::cout << filename <<std::endl;
+
     std::ifstream file(filename);
     if(file.is_open()) {
         std::string line;
@@ -211,10 +205,8 @@ std::vector<int> read_observed_counts_from_csv(const std::string& filename) {
             std::stringstream ss(line);
             std::string cell_count_str;
              
-            while(std::getline(ss, cell_count_str, ',')) { // ここを変更
-             std::cout << cell_count_str <<std::endl;
+            while(std::getline(ss, cell_count_str, ',')) { 
                 int cell_count = static_cast<int>(std::round(std::stod(cell_count_str)));
-                std::cout << cell_count <<std::endl;
                 observed_counts.push_back(cell_count);
                 
             }
@@ -225,47 +217,41 @@ std::vector<int> read_observed_counts_from_csv(const std::string& filename) {
 
     // Sort observed_counts in descending order
     std::sort(observed_counts.begin(), observed_counts.end(), std::greater<int>());
-    std::cout << observed_counts[0];
+    //std::cout << observed_counts[0];
     return observed_counts;
 }
 
-void copy_fitness_file() {
-    std::string filename = "fitness.csv";
-    std::string new_filename = "fitness_";
+void write_fitness_to_file(const std::vector<Chromosome>& population, std::string& output_filename, int max_generations) {
+    
 
-    auto now = std::chrono::system_clock::now();
-    auto time = std::chrono::system_clock::to_time_t(now);
-    struct tm* tm = localtime(&time);
-
-    char buffer[80];
-    strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", tm);
-    new_filename += buffer;
-    new_filename += ".csv";
-
-    std::filesystem::copy_file(filename, new_filename, std::filesystem::copy_options::overwrite_existing);
+    std::ofstream fitness_file(output_filename);
+    for(const auto& chromosome : population) {
+        fitness_file << "generation:" << max_generations << ", p_div: " << chromosome.p_div << ", func_decline: " << chromosome.func_decline << ", p_diff: " << chromosome.p_diff << ", p_die: " << chromosome.p_die << ", fitness: " << chromosome.fitness << std::endl;
+         
+    }
+    fitness_file.close();    
 }
+
 
 int main(int argc, char* argv[]) {
     std::string filename = argv[1];
     int time_steps = std::stoi(argv[2]);
     int initial_cells = std::stoi(argv[3]);
     //int n_simulations = std::stoi(argv[4]);
-    int population_size = 100;
-    int tournament_size = 5;
-    double crossover_rate = 0.8;
-    double mutation_rate = 0.1;
-    int elitism_count = 10;
-    int max_generations = 100;
+    int population_size = std::stoi(argv[4]); // default 100
+    int tournament_size = std::stoi(argv[5]);  //default 5
+    double crossover_rate = std::stod(argv[6]);  //default 0.8
+    double mutation_rate = std::stod(argv[7]);  // default 0.1
+    int elitism_count = std::stoi(argv[8]);  //default 10
+    int max_generations = std::stoi(argv[9]);  //default 100
+    std::string output_filename = argv[10];
 
     std::vector<int> observed_counts = read_observed_counts_from_csv(filename);
     int n_simulations = observed_counts.size(); // set n_simulations to number of lines in the file
 
 
     std::vector<Chromosome> best_chromosomes = optimize_parameters(time_steps, initial_cells, n_simulations, population_size, tournament_size, crossover_rate, mutation_rate, elitism_count, max_generations,observed_counts);
-    copy_fitness_file();
-    for(const auto& chromosome : best_chromosomes) {
-        std::cout << "p_div: " << chromosome.p_div << ", func_decline: " << chromosome.func_decline << ", p_diff: " << chromosome.p_diff << ", p_die: " << chromosome.p_die << ", fitness: " << chromosome.fitness << std::endl;
-    }
+    write_fitness_to_file(best_chromosomes,output_filename, max_generations); 
 
     return 0;
 }
