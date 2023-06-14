@@ -7,7 +7,7 @@ import numpy as np
 
 
 
-    # C++プログラムを実行する
+    # Call simulatior.exe
 
 def run_simulation():
 
@@ -32,7 +32,7 @@ def run_simulation():
         plot_bar_graph(result)
     
     else:
-        label.config(text="確率の総和は1以下にしてください")
+        label.config(text="Please ensure the total probability is less than or equal to 1.")
         
 def save_data(data):
     current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -41,17 +41,17 @@ def save_data(data):
    
     
 
-    # 出力を解析する
+    # Plot the simulated data on bargraph
 def plot_bar_graph(result):
 
     output = result.stdout.split('\n')
     data = [list(map(int, line.split())) for line in output if line]
 
-    # データを細胞数でソートする
+    # sort cell number in descending order
     data.sort(key=lambda x: x[0], reverse=True)
     print(data)
     save_data(data)
-    # データを棒グラフとしてプロットする
+    # plot a bar graph
     plt.bar(range(len(data)), [x[0] for x in data], tick_label=[x[1] for x in data])
     plt.xlabel('Simulation Result')
     plt.ylabel('Number of Cells')
