@@ -3,6 +3,9 @@
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 double objective_function(double p_die, double p_diff, double p_div, double func_decline) {
     // Run the simulation with the given parameters and calculate the sum of squared errors between the simulated and experimental cell counts
@@ -29,7 +32,7 @@ void update_position(std::vector<double>& position, std::vector<double>& velocit
     // Update the position of the particle based on its current velocity
 }
 
-std::vector<double> optimize_parameters(int num_particles, int num_iterations, double inertia_weight, double cognitive_weight, double social_weight) {
+std::vector<double> optimize_parameters(int num_particles, int num_iterations, double inertia_weight, double cognitive_weight, double social_weight, std::string& output_filename) {
     std::random_device rd{};
     std::mt19937 gen{rd()};
     std::uniform_real_distribution<> dis(0, 1);
@@ -75,14 +78,28 @@ std::vector<double> optimize_parameters(int num_particles, int num_iterations, d
     return swarm_best_position;
 }
 
-int main() {
-    std::vector<double> best_parameters = optimize_parameters(100, 100, 0.5, 1.0, 1.0);
+int main(int argc, char* argv[]) {
+
+    std::string filename = argv[1];
+    int time_steps = std::stoi(argv[2]);
+    int initial_cells = std::stoi(argv[3]);
+    //int n_simulations = std::stoi(argv[4]);
+    int num_particles = std::stoi(argv[4]); // default 100
+    int num_iterations = std::stoi(argv[5]);  //default 100
+    double inertia_weight = std::stod(argv[6]);  //default 0.5
+    double cognitive_weight = std::stod(argv[7]);  // default 1.0
+    double social_weight = std::stod(argv[8]);  //default 1.0
+    std::string output_filename = argv[9];
+    
+    
+    std::vector<double> best_parameters = optimize_parameters(num_particles, num_iterations, inertia_weight, cognitive_weight,social_weight, output_filename);
 
     std::cout << "Best parameters: ";
     for(double parameter : best_parameters) {
         std::cout << parameter << " ";
     }
     std::cout << std::endl;
+    std::cout << "Optimization completed was successfully completed." << std::endl;
 
     return 0;
 }

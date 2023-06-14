@@ -252,6 +252,6 @@ int main(int argc, char* argv[]) {
 
     std::vector<Chromosome> best_chromosomes = optimize_parameters(time_steps, initial_cells, n_simulations, population_size, tournament_size, crossover_rate, mutation_rate, elitism_count, max_generations,observed_counts);
     write_fitness_to_file(best_chromosomes,output_filename, max_generations); 
-
+    std::cout << "Optimization completed was successfully completed." << std::endl;
     return 0;
 }
