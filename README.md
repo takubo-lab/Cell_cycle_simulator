@@ -3,7 +3,7 @@
 
 Welcome to our comprehensive suite of cell biology tools, encompassing both an Optimizer and a Cell Simulator.
 
-The Optimizer, as a reinforcement learning based algorithm, aims to optimize the cell growth conditions by balancing the rate of cell division, differentiation, and death. It iteratively learns from the environment and adjusts the cell conditions to maximize cell growth and vitality.
+The Optimizer is designed to find the optimal parameters for the simulator, namely the probabilities of cell division, differentiation, and death, as well as the decline rate of division probability after differentiation. These parameters are adjusted iteratively to best replicate the actual cell counts observed in real-life experiments, thus providing a robust model for cell growth and behavior.
 
 On the other hand, the Cell Simulator provides a Graphical User Interface (GUI) to simulate cell proliferation. Users can specify probabilities associated with cell division, differentiation, and death, along with the function decline parameter, number of simulation time steps, initial cell count, and number of simulations. Multiple simulations can be run with results displayed as a bar graph, enabling visualization of cell behavior under different conditions.
 
