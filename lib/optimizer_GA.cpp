@@ -44,29 +44,8 @@ std::vector<Chromosome> generate_initial_population(int population_size) {
 
 double calculate_fitness(const Chromosome& chromosome, int time_steps, int initial_cells, int n_simulations, const std::vector<int>& observed_counts) {
     // simulated cell count vector
-    std::vector<int> final_cell_counts(n_simulations);
-    
-
-
-    for(int i = 0; i < n_simulations; ++i) {
-        auto cell_counts = simulate(time_steps, initial_cells, chromosome.p_die, chromosome.p_diff, chromosome.p_div, chromosome.func_decline);
-        int final_cell_count = cell_counts.back();
-        final_cell_counts[i] = final_cell_count;
-    }
-
-    std::sort(final_cell_counts.begin(), final_cell_counts.end(), std::greater<int>());
-    //std::cout << "simulated:" <<final_cell_counts[0] << std::endl;
-    //std::cout << "observed:" << observed_counts[0] << std::endl;
-    double total_sum_of_squares = 0;
-    for(int i = 0; i < n_simulations; ++i) {
-        double log_simulated_count = log(final_cell_counts[i]+1);
-        double log_observed_count = log(observed_counts[i]+1);  // avoid log 0 by adding pseudo count 1
-        double difference = log_simulated_count - log_observed_count;
-        total_sum_of_squares += abs(difference);
-    }
-
-    double fitness = - total_sum_of_squares / n_simulations;
-    return fitness;
+    double fitness = objective_function(time_steps, initial_cells, n_simulations, chromosome.p_div, chromosome.func_decline, chromosome.p_diff, chromosome.p_die, observed_counts);
+    return -fitness;
 }
 
 
@@ -195,31 +174,7 @@ std::vector<Chromosome> optimize_parameters(int time_steps, int initial_cells, i
     return population;
 }
 
-std::vector<int> read_observed_counts_from_csv(const std::string& filename) {
-    std::vector<int> observed_counts;
 
-    std::ifstream file(filename);
-    if(file.is_open()) {
-        std::string line;
-        while(std::getline(file, line)) {
-            std::stringstream ss(line);
-            std::string cell_count_str;
-             
-            while(std::getline(ss, cell_count_str, ',')) { 
-                int cell_count = static_cast<int>(std::round(std::stod(cell_count_str)));
-                observed_counts.push_back(cell_count);
-                
-            }
-        }
-        file.close();
-    }
-
-
-    // Sort observed_counts in descending order
-    std::sort(observed_counts.begin(), observed_counts.end(), std::greater<int>());
-    //std::cout << observed_counts[0];
-    return observed_counts;
-}
 
 void write_fitness_to_file(const std::vector<Chromosome>& population, std::string& output_filename, int max_generations) {
     
