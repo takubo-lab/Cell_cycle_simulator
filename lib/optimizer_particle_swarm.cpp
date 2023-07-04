@@ -36,9 +36,23 @@ void update_velocity(std::vector<double>& velocity, std::vector<double>& positio
 void update_position(std::vector<double>& position, std::vector<double>& velocity) {
     for(size_t i = 0; i < position.size(); ++i) {
         position[i] += velocity[i];
-        // Ensure that position values remain in the range [0, 1]
-        if (position[i] < 0) position[i] = 0;
-        if (position[i] > 1) position[i] = 1;
+        // Ensure that position values remain within the appropriate range
+        if(i == 0) { // p_div
+            if (position[i] < 0) position[i] = 0;
+            if (position[i] > 0.7) position[i] = 0.7;
+        }
+        else if(i == 1) { // func_decline
+            if (position[i] < 0) position[i] = 0;
+            if (position[i] > 30) position[i] = 30;
+        }
+        else if(i == 2) { // p_diff
+            if (position[i] < 0) position[i] = 0;
+            if (position[i] > 1) position[i] = 1;
+        }
+        else if(i == 3) { // p_die
+            if (position[i] < 0) position[i] = 0;
+            if (position[i] > 0.5) position[i] = 0.5;
+        }
     }
 }
 
