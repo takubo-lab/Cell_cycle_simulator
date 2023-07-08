@@ -4,6 +4,7 @@
 #include <vector>
 #include <numeric>
 #include <cmath>
+#include <iostream>
 
 double objective_function(int time_steps, int initial_cells, int n_simulations, double p_div, double func_decline, double p_diff, double p_die, std::vector<int> observed_counts) {
     //const int TIME_STEPS = 100;
@@ -17,20 +18,29 @@ double objective_function(int time_steps, int initial_cells, int n_simulations, 
         int final_cell_count = cell_counts.back();
         final_cell_counts[i] = final_cell_count;
     }
-
+/*
     std::sort(final_cell_counts.begin(), final_cell_counts.end(), std::greater<int>());
-
-    
+    for(int i =0; i<96; i++){
+    std::cout << final_cell_counts[i] << std::endl;
+    }
+  */  
     //std::cout << "simulated:" <<final_cell_counts[0] << std::endl;
     //std::cout << "observed:" << observed_counts[0] << std::endl;
     double total_sum_of_squares = 0;
-    for(int i = 0; i < n_simulations; ++i) {
-        double log_simulated_count = std::log(final_cell_counts[i]+1);
-        double log_observed_count = std::log(observed_counts[i]+1);  // avoid log 0 by adding pseudo count 1
-        double difference = log_simulated_count - log_observed_count;
+   for(int i = 0; i < n_simulations; ++i) {
+        double log_simulated_count = std::log(final_cell_counts[i]+10);
+        double log_observed_count = std::log(observed_counts[i]+10);  // avoid log 0 by adding pseudo count 1
+        double difference = (log_simulated_count - log_observed_count) *(log_simulated_count - log_observed_count);
         total_sum_of_squares += std::abs(difference);
     }
 
-    double fitness =  total_sum_of_squares / n_simulations;
+ /*for(int i = 0; i < n_simulations; ++i) {
+        
+        double difference = (final_cell_counts[i] - observed_counts[i]) * (final_cell_counts[i] - observed_counts[i]);
+        total_sum_of_squares += difference;
+    }
+*/
+    std::cout << total_sum_of_squares << std::endl;
+    double fitness = total_sum_of_squares / n_simulations;
     return fitness;
 }

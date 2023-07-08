@@ -20,6 +20,8 @@ std::vector<double> generate_particle(std::mt19937& gen, std::uniform_real_distr
     return particle;
 }
 
+
+
 void evaluate_particle(int time_steps, int initial_cells, int n_simulations, std::vector<double>& particle, double& fitness_value, std::vector<int> observed_counts) {
     // Assume that the objective_function is defined elsewhere in your code
     fitness_value = objective_function(time_steps, initial_cells, n_simulations, particle[0], particle[1], particle[2], particle[3], observed_counts);
@@ -62,6 +64,8 @@ std::pair<std::vector<double>, double>  optimize_parameters(int time_steps, int 
     std::uniform_real_distribution<> dis(0, 1);
 
     std::vector<std::vector<double>> particles(num_particles);
+    std::vector<std::vector<double>> velocities(num_particles, std::vector<double>(4, 0.0));  // Initialize with zero velocity
+
     std::vector<double> fitness_values(num_particles);
     std::vector<std::vector<double>> best_positions(num_particles);
     std::vector<double> best_fitness_values(num_particles);
@@ -83,8 +87,8 @@ std::pair<std::vector<double>, double>  optimize_parameters(int time_steps, int 
     for(int i = 0; i < num_iterations; i++) {
         for(int j = 0; j < num_particles; j++) {
             std::vector<double> velocity(particles[j].size());
-            update_velocity(velocity, particles[j], best_positions[j], swarm_best_position, inertia_weight, cognitive_weight, social_weight, gen, dis);
-            update_position(particles[j], velocity);
+            update_velocity(velocities[j], particles[j], best_positions[j], swarm_best_position, inertia_weight, cognitive_weight, social_weight, gen, dis);
+            update_position(particles[j], velocities[j]);
             evaluate_particle(time_steps,initial_cells,n_simulations, particles[j], fitness_values[j],observed_counts);
 
             if(fitness_values[j] < best_fitness_values[j]) {
@@ -97,7 +101,11 @@ std::pair<std::vector<double>, double>  optimize_parameters(int time_steps, int 
                 swarm_best_fitness_value = fitness_values[j];
             }
         }
-        std::cout <<"Iteration: " << i << ". p_div: " << swarm_best_position[0] << ", func_decline: " << swarm_best_position[1] << ", p_diff: " << swarm_best_position[2] << ", p_die: " << swarm_best_position[3] <<  ", fitness: " << swarm_best_fitness_value << std::endl;
+        //for(int idx = 0;  idx < 100; idx++){
+         std::cout <<"Iteration: " << i << ". p_div: " << swarm_best_position[0] << ", func_decline: " << swarm_best_position[1] << ", p_diff: " << swarm_best_position[2] << ", p_die: " << swarm_best_position[3] <<  ", fitness: " << swarm_best_fitness_value << std::endl;
+        //std::cout <<"Iteration: " << i << ". p_div: " << particles[idx][0] << ", func_decline: " << particles[idx][1] << ", p_diff: " << particles[idx][2] << ", p_die: " << particles[idx][3] <<  ", fitness: " << fitness_values[idx] << std::endl;
+        
+        //}
     }
 
     return std::make_pair(swarm_best_position, swarm_best_fitness_value);
